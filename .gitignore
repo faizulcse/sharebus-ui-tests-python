@@ -1,0 +1,11 @@
+.idea/
+target/
+allure-results/
+allure-report/
+venv/
+.pytest_cache
+*.pyc
+*_init__.py
+build
+dist
+selenium_automation_python.egg-info
