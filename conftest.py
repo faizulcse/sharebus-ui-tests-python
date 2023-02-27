@@ -14,17 +14,19 @@ def pytest_addoption(parser):
     parser.addoption("--EXPLICIT_WAIT", action="store", default=os.getenv("EXPLICIT_WAIT"))
 
 
-@pytest.fixture(autouse=True, scope="class")
-def before_test(request):
+@pytest.fixture(autouse=True)
+def driver_handler(request):
     pytest.data = request.config
     base_url = request.config.getoption("--BASE_URL")
-    wait = int(request.config.getoption("--IMPLICIT_WAIT"))
+    imp_wait = int(request.config.getoption("--IMPLICIT_WAIT"))
+    detach = request.config.getoption("--DETACH")
 
-    setup = DriverSetup()
-    driver = setup.get_driver(request.config)
-    driver.implicitly_wait(wait)
+    driver = DriverSetup().get_driver(request.config)
+    pytest.driver = driver
+    driver.implicitly_wait(imp_wait)
     driver.maximize_window()
     driver.get(base_url)
-    yield driver
-    if request.config.getoption("--DETACH") == "false" and driver is not None:
-        driver.quit()
+
+    yield
+    if detach == "false" and pytest.driver is not None:
+        pytest.driver.quit()
