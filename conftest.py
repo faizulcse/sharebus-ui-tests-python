@@ -16,17 +16,28 @@ def pytest_addoption(parser):
 
 @pytest.fixture(autouse=True)
 def driver_handler(request):
-    pytest.data = request.config
+    browser = request.config.getoption("--BROWSER").lower()
     base_url = request.config.getoption("--BASE_URL")
-    imp_wait = int(request.config.getoption("--IMPLICIT_WAIT"))
     detach = request.config.getoption("--DETACH")
+    imp_wait = int(request.config.getoption("--IMPLICIT_WAIT"))
+    pytest.data = request.config
 
-    driver = DriverSetup().get_driver(request.config)
-    pytest.driver = driver
+    print("==============start_driver======>")
+    driver = DriverSetup().get_driver(browser)
     driver.implicitly_wait(imp_wait)
     driver.maximize_window()
     driver.get(base_url)
+    pytest.driver = driver
 
     yield
     if detach == "false" and pytest.driver is not None:
+        print("==============quit_driver======>")
         pytest.driver.quit()
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    result = outcome.get_result()
+    if result.when == "call" and result.failed:
+        print("<======take_screenshot_on_failed=====>")

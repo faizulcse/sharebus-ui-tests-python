@@ -1,3 +1,4 @@
+import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -6,10 +7,9 @@ from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 
 class DriverSetup:
-    def get_driver(self, data):
-        browser = data.getoption("--BROWSER").lower()
-        headless = data.getoption("--HEADLESS").lower()
-        detach = data.getoption("--DETACH").lower()
+    def get_driver(self, browser):
+        headless = pytest.data.getoption("--HEADLESS").lower()
+        detach = pytest.data.getoption("--DETACH").lower()
         match browser:
             case "chrome":
                 service = Service(ChromeDriverManager().install())
