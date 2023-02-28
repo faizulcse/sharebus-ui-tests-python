@@ -19,7 +19,6 @@ def pytest_addoption(parser):
 def driver_handler(request):
     pytest.config = request.config
     base_url = pytest.config.getoption("--BASE_URL")
-    detach = pytest.config.getoption("--DETACH")
     imp_wait = int(pytest.config.getoption("--IMPLICIT_WAIT"))
 
     print("\n==============start_driver============>")
@@ -34,6 +33,7 @@ def driver_handler(request):
 
     yield
     print("\n==============quit_driver=============>")
+    detach = pytest.config.getoption("--DETACH")
     if detach == "false" and pytest.driver is not None:
         pytest.driver.quit()
 
