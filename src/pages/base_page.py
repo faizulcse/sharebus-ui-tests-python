@@ -7,17 +7,17 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 class BasePage:
     def __init__(self):
-        self._driver = pytest.driver if pytest.driver is not None else webdriver.Remote()
-        self._wait = int(pytest.data.getoption("--EXPLICIT_WAIT"))
+        self.driver = pytest.driver if pytest.driver is not None else webdriver.Remote()
+        self.wait = int(pytest.data.getoption("--EXPLICIT_WAIT"))
 
     def get_title(self):
-        return self._driver.title
+        return self.driver.title
 
     def find_element(self, *locator):
-        return self._driver.find_element(*locator)
+        return self.driver.find_element(*locator)
 
     def find_elements(self, *locator):
-        return self._driver.find_elements(*locator)
+        return self.driver.find_elements(*locator)
 
     def wait_for_visibility(self, *locator):
         return self.get_fluent_wait().until(EC.visibility_of_element_located(*locator))
@@ -32,8 +32,8 @@ class BasePage:
         return self.get_fluent_wait().until(EC.alert_is_present())
 
     def get_fluent_wait(self):
-        return WebDriverWait(self._driver, self._wait, 1,
+        return WebDriverWait(self.driver, self.wait, 1,
                              ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException])
 
     def scroll_to_bottom(self):
-        self._driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")

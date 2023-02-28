@@ -22,7 +22,7 @@ def driver_handler(request):
     imp_wait = int(request.config.getoption("--IMPLICIT_WAIT"))
     pytest.data = request.config
 
-    print("==============start_driver======>")
+    print("\n==============start_driver============>")
     driver = DriverSetup().get_driver(browser)
     driver.implicitly_wait(imp_wait)
     driver.maximize_window()
@@ -30,14 +30,14 @@ def driver_handler(request):
     pytest.driver = driver
 
     yield
-    print("==============quit_driver======>")
+    print("\n==============quit_driver=============>")
     if detach == "false" and pytest.driver is not None:
         pytest.driver.quit()
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item, call):
+def pytest_runtest_makereport():
     outcome = yield
     result = outcome.get_result()
     if result.when == "call" and result.failed:
-        print("<======take_screenshot_on_failed=====>")
+        print("=======take_screenshot_on_failed======>")
