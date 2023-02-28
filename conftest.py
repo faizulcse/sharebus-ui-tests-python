@@ -30,8 +30,8 @@ def driver_handler(request):
     pytest.driver = driver
 
     yield
+    print("==============quit_driver======>")
     if detach == "false" and pytest.driver is not None:
-        print("==============quit_driver======>")
         pytest.driver.quit()
 
 
