@@ -8,7 +8,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 class BasePage:
     def __init__(self):
         self.driver = pytest.driver if pytest.driver is not None else webdriver.Remote()
-        self.wait = int(pytest.data.getoption("--EXPLICIT_WAIT"))
+        self.wait = int(pytest.config.getoption("--EXPLICIT_WAIT"))
 
     def get_title(self):
         return self.driver.title

@@ -3,6 +3,7 @@ import os
 import pytest
 
 from src.setup.driver_setup import DriverSetup
+from src.utils.file_helper import FileHelper
 
 
 def pytest_addoption(parser):
@@ -14,20 +15,22 @@ def pytest_addoption(parser):
     parser.addoption("--EXPLICIT_WAIT", action="store", default=os.getenv("EXPLICIT_WAIT"))
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def driver_handler(request):
-    browser = request.config.getoption("--BROWSER").lower()
-    base_url = request.config.getoption("--BASE_URL")
-    detach = request.config.getoption("--DETACH")
-    imp_wait = int(request.config.getoption("--IMPLICIT_WAIT"))
-    pytest.data = request.config
+    pytest.config = request.config
+    base_url = pytest.config.getoption("--BASE_URL")
+    detach = pytest.config.getoption("--DETACH")
+    imp_wait = int(pytest.config.getoption("--IMPLICIT_WAIT"))
 
     print("\n==============start_driver============>")
-    driver = DriverSetup().get_driver(browser)
+    driver = DriverSetup().get_driver(pytest)
     driver.implicitly_wait(imp_wait)
     driver.maximize_window()
     driver.get(base_url)
+
     pytest.driver = driver
+    pytest.working_dir = os.getcwd()
+    pytest.testcase = os.environ.get('PYTEST_CURRENT_TEST').split("::")[2].split(" ")[0]
 
     yield
     print("\n==============quit_driver=============>")
@@ -41,3 +44,4 @@ def pytest_runtest_makereport():
     result = outcome.get_result()
     if result.when == "call" and result.failed:
         print("=======take_screenshot_on_failed======>")
+        FileHelper().take_screenshot(pytest)
