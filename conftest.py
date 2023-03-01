@@ -15,7 +15,7 @@ def pytest_addoption(parser):
     parser.addoption("--EXPLICIT_WAIT", action="store", default=os.getenv("EXPLICIT_WAIT"))
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def driver_handler(request):
     pytest.config = request.config
     base_url = pytest.config.getoption("--BASE_URL")
@@ -28,11 +28,14 @@ def driver_handler(request):
     driver.get(base_url)
 
     pytest.driver = driver
-    pytest.working_dir = os.getcwd()
-    pytest.testcase = os.environ.get('PYTEST_CURRENT_TEST').split("::")[2].split(" ")[0]
+    pytest.root_dir = os.path.dirname(os.path.abspath(__file__))
+    pytest.testcase = os.environ.get("PYTEST_CURRENT_TEST").split("::")[2].split(" ")[0]
 
     yield
-    print("\n==============quit_driver=============>")
+    print("\n=======take_screenshot_on_failed======>")
+    FileHelper().take_screenshot(pytest)
+
+    print("==============quit_driver=============>")
     detach = pytest.config.getoption("--DETACH")
     if detach == "false" and pytest.driver is not None:
         pytest.driver.quit()
@@ -42,6 +45,3 @@ def driver_handler(request):
 def pytest_runtest_makereport():
     outcome = yield
     result = outcome.get_result()
-    if result.when == "call" and result.failed:
-        print("=======take_screenshot_on_failed======>")
-        FileHelper().take_screenshot(pytest)
